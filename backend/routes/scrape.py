@@ -1,28 +1,37 @@
-from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException, Header
+import asyncio
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, BackgroundTasks
+from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
-from database import get_db
+
+from auth import verify_token
+from database import get_db, SessionLocal
 from models import Job, Outline
 from services import firecrawl, youtube, outline_gen, storage, robots_check
-from datetime import datetime
-import os
 
 router = APIRouter()
 
-def verify_token(authorization: str = Header(None)):
-    secret = os.getenv("PALANTIR_SECRET")
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    if authorization.split(" ", 1)[1] != secret:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+
+class ScrapeRequest(BaseModel):
+    url: str
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, v: str) -> str:
+        if not v.startswith(("http://", "https://")):
+            raise ValueError("URL must start with http:// or https://")
+        return v
+
 
 @router.post("/scrape")
 async def scrape(
-    body: dict,
+    body: ScrapeRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     _: None = Depends(verify_token),
 ):
-    url: str = body["url"]
+    url = body.url
     source_type = "youtube" if ("youtube.com" in url or "youtu.be" in url) else "web"
     job = Job(url=url, source_type=source_type, status="pending")
     db.add(job)
@@ -31,15 +40,18 @@ async def scrape(
     background_tasks.add_task(process_job, job.id, url, source_type)
     return {"job_id": job.id, "status": "pending"}
 
+
 async def process_job(job_id: int, url: str, source_type: str):
-    from database import SessionLocal
     db = SessionLocal()
+    job = None
     try:
         job = db.query(Job).filter(Job.id == job_id).first()
+        if not job:
+            return
         job.status = "running"
         db.commit()
 
-        robots = robots_check.check(url)
+        robots = await asyncio.to_thread(robots_check.check, url)
         if robots == "disallowed":
             job.status = "error"
             job.error_msg = "The stone has been barred. (robots.txt blocks this URL)"
@@ -65,11 +77,15 @@ async def process_job(job_id: int, url: str, source_type: str):
         job.completed_at = datetime.utcnow()
         db.commit()
     except Exception as e:
-        job.status = "error"
-        job.error_msg = str(e)
-        db.commit()
+        db.rollback()
+        _job = db.query(Job).filter(Job.id == job_id).first()
+        if _job:
+            _job.status = "error"
+            _job.error_msg = str(e)
+            db.commit()
     finally:
         db.close()
+
 
 def extract_title(md: str) -> str:
     for line in md.splitlines():

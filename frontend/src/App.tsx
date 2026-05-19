@@ -5,7 +5,7 @@ import { JobStatus } from "./components/JobStatus"
 import { OutlineViewer } from "./components/OutlineViewer"
 import { OutlineHistory } from "./components/OutlineHistory"
 import { listOutlines, getOutline } from "./api"
-import type { Outline } from "./api"
+import type { Outline, OutlineListItem } from "./api"
 
 function App() {
   const [currentJobId, setCurrentJobId] = useState<number | null>(null)
@@ -30,12 +30,12 @@ function App() {
     } catch {}
   }
 
-  async function handleSelectOutline(outline: Outline) {
+  async function handleSelectOutline(outline: OutlineListItem) {
     try {
       const full = await getOutline(outline.id)
       setSelectedOutline(full)
     } catch {
-      setSelectedOutline(outline)
+      // full outline fetch failed — don't render partial object without md_content
     }
   }
 
@@ -88,7 +88,7 @@ function App() {
           {/* Right: History Sidebar */}
           <div className="col-span-3 lg:col-span-1">
             <div className="sticky top-8 bg-stone-surface rounded-lg p-4 border border-stone-accent/20">
-              <OutlineHistory onSelect={handleSelectOutline} selectedId={selectedOutline?.id || null} refreshKey={refreshKey} />
+              <OutlineHistory onSelect={handleSelectOutline} selectedId={selectedOutline?.id ?? null} refreshKey={refreshKey} />
             </div>
           </div>
         </div>

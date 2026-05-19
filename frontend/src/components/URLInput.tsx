@@ -8,7 +8,14 @@ export function URLInput({ onSubmit }: { onSubmit: (jobId: number) => void }) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!url.trim()) return
+    if (!url.trim()) {
+      setError("Place a URL in the stone first.")
+      return
+    }
+    if (!/^https?:\/\//i.test(url.trim())) {
+      setError("That doesn't look like a URL.")
+      return
+    }
 
     setLoading(true)
     setError(null)
@@ -33,9 +40,9 @@ export function URLInput({ onSubmit }: { onSubmit: (jobId: number) => void }) {
           <input
             type="url"
             value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => { setUrl(e.target.value); if (error) setError(null) }}
             placeholder="https://example.com"
-            className="w-full px-4 py-3 bg-stone-surface border border-stone-accent/30 rounded text-stone-text placeholder-stone-text/50 focus:outline-none focus:ring-2 focus:ring-stone-accent/50 font-cinzel"
+            className="w-full px-4 py-3 bg-stone-surface border border-stone-accent/30 rounded text-stone-text placeholder-stone-text/50 focus:outline-none focus:ring-2 focus:ring-stone-teal/60 focus:border-stone-teal font-cinzel"
             disabled={loading}
           />
         </div>
@@ -48,8 +55,8 @@ export function URLInput({ onSubmit }: { onSubmit: (jobId: number) => void }) {
 
         <button
           type="submit"
-          disabled={loading || !url.trim()}
-          className="w-full px-4 py-3 bg-stone-accent text-stone-bg font-cinzel font-bold rounded hover:bg-stone-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          disabled={loading}
+          className="w-full px-4 py-3 bg-stone-teal text-stone-bg font-cinzel font-bold rounded hover:bg-stone-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-stone-teal/60 focus:ring-offset-2 focus:ring-offset-stone-bg"
         >
           {loading ? "The Eye searches..." : "Gaze Into the Stone"}
         </button>

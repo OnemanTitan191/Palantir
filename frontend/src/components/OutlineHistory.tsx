@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { listOutlines } from "../api"
-import type { Outline } from "../api"
+import type { OutlineListItem } from "../api"
 import { Archive } from "lucide-react"
 
-export function OutlineHistory({ onSelect, selectedId, refreshKey }: { onSelect: (outline: Outline) => void; selectedId: number | null; refreshKey: number }) {
-  const [outlines, setOutlines] = useState<Outline[]>([])
+export function OutlineHistory({ onSelect, selectedId, refreshKey }: { onSelect: (outline: OutlineListItem) => void; selectedId: number | null; refreshKey: number }) {
+  const [outlines, setOutlines] = useState<OutlineListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,9 +47,9 @@ export function OutlineHistory({ onSelect, selectedId, refreshKey }: { onSelect:
         <button
           key={outline.id}
           onClick={() => onSelect(outline)}
-          className={`w-full text-left p-3 rounded transition-colors ${
+          className={`w-full text-left p-3 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-teal/60 ${
             selectedId === outline.id
-              ? "bg-stone-accent/20 border border-stone-accent"
+              ? "bg-stone-teal/15 border border-stone-teal"
               : "bg-stone-surface hover:bg-stone-surface/80 border border-stone-surface"
           }`}
         >

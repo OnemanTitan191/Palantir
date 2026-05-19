@@ -8,18 +8,18 @@ async def fetch(url: str) -> str:
 
     api_url = os.getenv("FIRECRAWL_API_URL", "http://localhost:3002")
     api_key = os.getenv("FIRECRAWL_API_KEY", "test-key-local-dev")
-    try:
-        async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(
-                f"{api_url}/v1/scrape",
-                json={"url": url, "formats": ["markdown"]},
-                headers={"Authorization": f"Bearer {api_key}"}
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("data", {}).get("markdown", "")
-    except Exception as e:
-        return _mock_content(url)
+    async with httpx.AsyncClient(timeout=60) as client:
+        resp = await client.post(
+            f"{api_url}/v1/scrape",
+            json={"url": url, "formats": ["markdown"]},
+            headers={"Authorization": f"Bearer {api_key}"}
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data.get("data", {}).get("markdown", "")
+    if not content.strip():
+        raise RuntimeError(f"Firecrawl returned empty content for {url}")
+    return content
 
 def _mock_content(url: str) -> str:
     return f"""# Content from {url}

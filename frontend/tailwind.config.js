@@ -8,7 +8,8 @@ export default {
           bg: "#0d0d0d",
           surface: "#1a1a2e",
           text: "#e8e8f0",
-          accent: "#c4963e"
+          accent: "#c4963e",
+          teal: "#00bcd4"
         },
       },
     },

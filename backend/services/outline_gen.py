@@ -2,6 +2,8 @@ import anthropic
 import os
 from datetime import datetime
 
+_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+
 SYSTEM_PROMPT = """You are a research assistant that converts scraped web/YouTube content into structured outlines.
 
 Output a markdown document with this exact structure:
@@ -38,7 +40,7 @@ Rules:
 async def generate(url: str, source_type: str, raw_content: str, robots_status: str) -> str:
     client = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     resp = await client.messages.create(
-        model="claude-sonnet-4-6",
+        model=_MODEL,
         max_tokens=4096,
         system=[{
             "type": "text",

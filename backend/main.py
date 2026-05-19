@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -11,6 +12,8 @@ load_dotenv(_env_path, override=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if not os.getenv("PALANTIR_SECRET"):
+        raise RuntimeError("PALANTIR_SECRET env var is required but not set")
     Base.metadata.create_all(bind=engine)
     yield
 
@@ -19,7 +22,7 @@ app = FastAPI(title="Palantir", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5175", "http://127.0.0.1:5175",
+        "http://localhost:5180", "http://127.0.0.1:5180",
         "http://localhost:3000", "http://127.0.0.1:3000",
     ],
     allow_methods=["*"],

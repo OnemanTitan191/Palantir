@@ -1,17 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+from auth import verify_token
 from database import get_db
 from models import Job
-import os
 
 router = APIRouter()
 
-def verify_token(authorization: str = Header(None)):
-    secret = os.getenv("PALANTIR_SECRET")
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    if authorization.split(" ", 1)[1] != secret:
-        raise HTTPException(status_code=401, detail="Unauthorized")
 
 @router.get("/jobs")
 def list_jobs(db: Session = Depends(get_db), _: None = Depends(verify_token)):
@@ -28,6 +23,7 @@ def list_jobs(db: Session = Depends(get_db), _: None = Depends(verify_token)):
         }
         for j in jobs
     ]
+
 
 @router.get("/jobs/{job_id}")
 def get_job(job_id: int, db: Session = Depends(get_db), _: None = Depends(verify_token)):

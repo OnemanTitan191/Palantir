@@ -19,7 +19,9 @@ export function JobStatus({ jobId, onComplete }: { jobId: number; onComplete: ()
           clearInterval(interval)
         }
       } catch (err) {
+        setStatus("error")
         setErrorMsg("Failed to fetch job status")
+        clearInterval(interval)
       }
     }, 2000)
 
@@ -48,9 +50,9 @@ export function JobStatus({ jobId, onComplete }: { jobId: number; onComplete: ()
     <div className="text-center space-y-3">
       <div className="text-stone-accent font-cinzel text-lg animate-pulse">The Eye searches...</div>
       <div className="flex justify-center gap-1">
-        <div className="w-2 h-2 bg-stone-accent rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
-        <div className="w-2 h-2 bg-stone-accent rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-        <div className="w-2 h-2 bg-stone-accent rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+        <div className="w-2 h-2 bg-stone-teal rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
+        <div className="w-2 h-2 bg-stone-teal rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+        <div className="w-2 h-2 bg-stone-teal rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
       </div>
     </div>
   )

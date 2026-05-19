@@ -44,15 +44,15 @@ export function OutlineViewer({ outline }: { outline: Outline }) {
         <div className="flex gap-2">
           <button
             onClick={handleCopy}
-            className="p-2 bg-stone-surface hover:bg-stone-surface/80 rounded transition-colors"
-            title="Copy to clipboard"
+            aria-label="Copy outline to clipboard"
+            className="p-2 bg-stone-surface hover:bg-stone-surface/80 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-teal/60"
           >
             {copied ? <Check size={18} className="text-green-400" /> : <Copy size={18} className="text-stone-text" />}
           </button>
           <button
             onClick={handleDownload}
-            className="p-2 bg-stone-accent hover:bg-stone-accent/90 rounded transition-colors text-stone-bg"
-            title="Download markdown"
+            aria-label="Download outline as markdown"
+            className="p-2 bg-stone-accent hover:bg-stone-accent/90 rounded transition-colors text-stone-bg focus:outline-none focus:ring-2 focus:ring-stone-teal/60"
           >
             <Download size={18} />
           </button>
