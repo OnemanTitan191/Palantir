@@ -1,14 +1,15 @@
-from contextlib import asynccontextmanager
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(_env_path, override=True)
+
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
 from routes import scrape, jobs, outlines
-
-_env_path = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(_env_path, override=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

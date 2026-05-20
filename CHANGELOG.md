@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0] — 2026-05-19
+
+### Added
+- Auto-save outlines directly to BarahdurVault/04 Archive/Palantir (configurable via PALANTIR_OUTPUTS_DIR)
+- Filename format changed to YYYY_MM_DD_slug (underscores throughout)
+- Document H1 now includes filename + creation datetime + clickable source URL
+
+### Fixed
+- VITE_PALANTIR_SECRET ?? hardcoded fallback — auth no longer fails when Vite starts before .env is resolved on Windows
+- load_dotenv moved before all imports in main.py — module-level os.getenv() calls now see env vars at import time
+- Removed stale backend/.env placeholder (had ANTHROPIC_API_KEY=your-key-here, caused confusion)
+
+---
+
 ## [1.0.0] — 2026-05-19
 
 ### Added

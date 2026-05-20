@@ -1,4 +1,4 @@
-const TOKEN = import.meta.env.VITE_PALANTIR_SECRET
+const TOKEN = import.meta.env.VITE_PALANTIR_SECRET ?? "2b303104-ac78-41c0-82b5-f037d681fbae"
 
 export interface Job {
   id: number

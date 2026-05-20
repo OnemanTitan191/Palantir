@@ -64,13 +64,14 @@ async def process_job(job_id: int, url: str, source_type: str):
             raw_content = await firecrawl.fetch(url)
 
         outline_md = await outline_gen.generate(url, source_type, raw_content, robots)
-        file_path = storage.write_md(url, outline_md)
+        title = extract_title(outline_md)
+        modified_content, file_path = storage.write_md(url, outline_md)
 
         outline = Outline(
-            job_id=job_id, title=extract_title(outline_md),
+            job_id=job_id, title=title,
             source_url=url, source_type=source_type,
             scraped_at=datetime.utcnow(), robots_status=robots,
-            md_content=outline_md, file_path=str(file_path),
+            md_content=modified_content, file_path=str(file_path),
         )
         db.add(outline)
         job.status = "done"
